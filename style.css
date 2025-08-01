@@ -217,6 +217,24 @@ body::before {
     text-shadow: 0 0 15px #ff0000 !important;
 }
 
+/* Email drafting styling */
+.email-warning {
+    color: #ff6600 !important;
+    text-shadow: 0 0 15px #ff6600 !important;
+    animation: emailPulse 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes emailPulse {
+    from { 
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    to { 
+        transform: scale(1.05);
+        filter: brightness(1.2);
+    }
+}
+
 /* Overshoot styling */
 .overshoot-message {
     color: #ffaa00 !important;

@@ -14,6 +14,7 @@ A Miami Vice-inspired, 80s neon-styled mini golf game featuring Jeff as the ball
 - **⚡ Forgiving Hole Mechanics**: Improved hole entry with magnetic slowdown effect!
 - **🎨 Smaller Obstacles**: More challenging and strategic gameplay
 - **🎉 Jeff Rain Victory**: Epic celebration with 50 falling Jeffs when you win!
+- **📧 Boss Notification**: Lose the game and auto-draft a shameful email to Jeffrey Jenkins!
 
 ## 🚀 How to Play
 
@@ -53,6 +54,7 @@ start index.html
 - **Random Exits**: Face tunnel spits you out in unpredictable directions
 - **New Course**: Obstacles randomize each time you restart
 - **Victory Celebration**: Win to see Jeff rain down from the sky! 🎉
+- **Failure Consequences**: Lose and get a boss notification email drafted! 📧
 
 ## 🎨 EXTREME Neon Features
 
@@ -84,6 +86,12 @@ This project includes fun git aliases:
 - The **face tunnel** is risky but can provide shortcuts
 - **Listen for audio cues** - different sounds for different actions
 - Each **restart generates new obstacles** - adapt your strategy!
+
+## ⚠️ WARNING
+
+**LOSING THE GAME WILL AUTO-DRAFT AN EMAIL TO JEFFREY JENKINS REPORTING YOUR FAILURE!**
+
+This is a humorous feature that opens your default email client with a pre-written "performance report" if you exceed 20 strokes. The email won't send automatically, but your draft folder will contain evidence of your mini-golf inadequacy. Play responsibly! 😄
 
 ---
 
