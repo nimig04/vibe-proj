@@ -223,6 +223,22 @@ class NeonGolf {
         
         // Prevent context menu
         this.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+        
+        // Debug: Manual triggers (remove after testing)
+        window.testWin = () => {
+            this.strokes = 2; // Simulate under par
+            this.startJeffRain();
+            this.gameOver(true);
+        };
+        window.testLoss = () => {
+            this.strokes = 5; // Simulate over par
+            this.gameOver(false);
+        };
+        window.testGaveUp = () => {
+            this.strokes = 20; // Simulate giving up
+            this.gameOver(false);
+        };
+        console.log('Debug functions: testWin(), testLoss(), testGaveUp()');
     }
     
     getMousePos(e) {
@@ -301,8 +317,10 @@ class NeonGolf {
         // Play hit sound - silly retro beep
         this.playSound(400 + this.club.power * 5, 0.3, 'square');
         
-        // Check game over conditions
+        // Check if player has given up (too many strokes without completing hole)
+        console.log(`Strokes: ${this.strokes}/${this.maxStrokes}`); // Debug log
         if (this.strokes >= this.maxStrokes) {
+            console.log('GAVE UP! Too many strokes - triggering loss condition!'); // Debug log
             setTimeout(() => this.gameOver(false), 1000);
         }
     }
@@ -559,12 +577,21 @@ class NeonGolf {
             const maxHoleSpeed = 6; // Increased from 3 - more forgiving!
             
             if (currentSpeed <= maxHoleSpeed) {
-                // Ball is moving slow enough - successful hole!
+                // Ball is moving slow enough - hole completed!
                 this.ball.vx = 0;
                 this.ball.vy = 0;
-                // Start Jeff rain celebration!
-                this.startJeffRain();
-                this.gameOver(true);
+                
+                // Check par-based win/loss conditions
+                if (this.strokes <= this.par) {
+                    // Par or under - WIN!
+                    console.log(`WIN! Hole completed in ${this.strokes} strokes (Par ${this.par})`);
+                    this.startJeffRain();
+                    this.gameOver(true);
+                } else {
+                    // Over par - LOSS!
+                    console.log(`LOSS! Hole completed in ${this.strokes} strokes (Over Par ${this.par})`);
+                    this.gameOver(false);
+                }
             } else {
                 // Ball is moving too fast - overshoot!
                 this.handleOvershoot();
@@ -622,6 +649,7 @@ class NeonGolf {
     }
     
     startJeffRain() {
+        console.log('JEFF RAIN STARTING!'); // Debug log
         this.jeffRainActive = true;
         this.jeffRain = [];
         
@@ -667,7 +695,12 @@ class NeonGolf {
     }
     
     drawJeffRain() {
-        if (!this.jeffRainActive || !this.ballImageLoaded) return;
+        if (!this.jeffRainActive || !this.ballImageLoaded) {
+            if (!this.jeffRainActive) console.log('Jeff rain not active');
+            if (!this.ballImageLoaded) console.log('Ball image not loaded');
+            return;
+        }
+        console.log(`Drawing ${this.jeffRain.length} Jeff rain drops`); // Debug log
         
         for (let jeff of this.jeffRain) {
             this.ctx.save();
@@ -695,22 +728,27 @@ class NeonGolf {
     }
     
     gameOver(won) {
+        console.log(`GAME OVER CALLED: ${won ? 'WON' : 'LOST'}`); // Debug log
         this.gameState = won ? 'won' : 'lost';
         const statusEl = document.getElementById('gameStatus');
         
         if (won) {
-            if (this.strokes <= this.par) {
-                statusEl.textContent = `🏆 HOLE IN ${this.strokes}! UNDER PAR! 🏆`;
-                statusEl.className = 'game-status win-message';
-                // Victory fanfare
-                this.playVictorySound();
-            } else {
-                statusEl.textContent = `⭐ HOLE IN ${this.strokes}! NOT BAD! ⭐`;
-                statusEl.className = 'game-status win-message';
-                this.playSound(600, 0.5);
+            // Win messages based on par performance
+            if (this.strokes === 1) {
+                statusEl.textContent = `🥇 HOLE IN ONE! INCREDIBLE! 🥇`;
+            } else if (this.strokes <= this.par) {
+                const parText = this.strokes === this.par ? 'PAR' : 'UNDER PAR';
+                statusEl.textContent = `🏆 HOLE IN ${this.strokes}! ${parText}! 🏆`;
             }
+            statusEl.className = 'game-status win-message';
+            this.playVictorySound();
         } else {
-            statusEl.textContent = `💀 GAME OVER! TOO MANY STROKES! 💀`;
+            // Loss messages - either over par or gave up
+            if (this.strokes >= this.maxStrokes) {
+                statusEl.textContent = `💀 GAVE UP! TOO MANY ATTEMPTS! 💀`;
+            } else {
+                statusEl.textContent = `😞 OVER PAR! ${this.strokes} STROKES ON PAR ${this.par}! 😞`;
+            }
             statusEl.className = 'game-status lose-message';
             this.playSound(200, 1, 'square');
             
@@ -723,6 +761,7 @@ class NeonGolf {
     }
     
     draftFailureEmail() {
+        console.log('DRAFTING FAILURE EMAIL!'); // Debug log
         // Delay email draft by 2 seconds for dramatic effect
         setTimeout(() => {
             const recipient = 'jenkins_jeffrey@bah.com';

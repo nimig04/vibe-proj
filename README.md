@@ -44,17 +44,32 @@ start index.html
 2. **Release** to shoot Jeff toward the hole
 3. **Avoid obstacles** or use them strategically
 4. **Aim for the face's mouth** for tunnel shortcuts (but exits are random!)
-5. **Get to the hole in ≤3 strokes** to win!
+5. **Complete the hole in ≤3 strokes to WIN, 4+ strokes to LOSE!**
+
+### 🎯 **Scoring System:**
+- **1 stroke**: 🥇 Hole in One! (Epic Jeff rain celebration)
+- **2 strokes**: 🏆 Under Par! (Jeff rain celebration)
+- **3 strokes**: 🏆 Par! (Jeff rain celebration)
+- **4+ strokes**: 😞 Over Par = Loss (Boss email gets drafted)
+- **20+ strokes**: 💀 Gave Up = Loss (Boss email gets drafted)
 
 ## 🏆 Game Rules
 
-- **Par 3**: Try to sink Jeff in 3 strokes or less
-- **Forgiving Hole**: Magnetic slowdown near the hole + higher speed tolerance!
-- **20 Stroke Limit**: Game over if you exceed 20 strokes
-- **Random Exits**: Face tunnel spits you out in unpredictable directions
-- **New Course**: Obstacles randomize each time you restart
-- **Victory Celebration**: Win to see Jeff rain down from the sky! 🎉
-- **Failure Consequences**: Lose and get a boss notification email drafted! 📧
+- **WIN**: Complete the hole in **3 strokes or less** (Par or under)
+  - 🥇 **Hole in One**: 1 stroke = Ultimate victory!
+  - 🏆 **Under Par**: 2 strokes = Great shot!
+  - 🏆 **Par**: 3 strokes = Good job!
+
+- **LOSE**: Complete the hole in **4+ strokes** (Over par) OR give up
+  - 😞 **Over Par**: 4+ strokes when you complete the hole
+  - 💀 **Gave Up**: 20+ strokes without completing the hole
+
+- **Special Features**:
+  - **Forgiving Hole**: Magnetic slowdown + higher speed tolerance!
+  - **Random Exits**: Face tunnel spits you out unpredictably
+  - **New Course**: Obstacles randomize each restart
+  - **Victory Celebration**: Jeff rain when you win! 🎉
+  - **Failure Consequences**: Boss email when you lose! 📧
 
 ## 🎨 EXTREME Neon Features
 
