@@ -66,6 +66,10 @@ class NeonGolf {
         };
         this.ballImage.src = 'jeff.png';
         
+        // Jeff rain system for victory celebration
+        this.jeffRain = [];
+        this.jeffRainActive = false;
+        
         // Bind events
         this.bindEvents();
         
@@ -130,14 +134,53 @@ class NeonGolf {
                 tunnelProgress: 0
             },
             
-            // Side barriers for challenge (scaled up)
-            { x: w * 0.15, y: h * 0.5, width: 120, height: 35, type: 'barrier' },
-            { x: w * 0.65, y: h * 0.3, width: 95, height: 95, type: 'barrier' },
-            { x: w * 0.6, y: h * 0.7, width: 140, height: 30, type: 'barrier' },
-            
-            // Water hazard (decorative - acts like barrier, scaled up)
-            { x: w * 0.75, y: h * 0.55, width: 95, height: 48, type: 'water' }
+            // Randomized smaller obstacles
+            ...this.generateRandomObstacles(w, h)
         );
+        
+        return obstacles;
+    }
+    
+    generateRandomObstacles(w, h) {
+        const obstacles = [];
+        const obstacleCount = 4 + Math.floor(Math.random() * 3); // 4-6 random obstacles
+        
+        // Avoid the face area and starting/ending areas
+        const avoidAreas = [
+            { x: 0, y: h * 0.8, width: w * 0.3, height: h * 0.2 }, // Starting area
+            { x: w * 0.7, y: 0, width: w * 0.3, height: h * 0.3 }, // Hole area
+            { x: w * 0.25, y: h * 0.15, width: w * 0.4, height: h * 0.6 } // Face area
+        ];
+        
+        for (let i = 0; i < obstacleCount; i++) {
+            let attempts = 0;
+            let validPosition = false;
+            let obstacle;
+            
+            while (!validPosition && attempts < 20) {
+                const x = Math.random() * (w * 0.8);
+                const y = Math.random() * (h * 0.8);
+                const width = 30 + Math.random() * 60; // Smaller obstacles: 30-90px
+                const height = 25 + Math.random() * 50; // Smaller obstacles: 25-75px
+                const type = Math.random() < 0.3 ? 'water' : 'barrier';
+                
+                obstacle = { x, y, width, height, type };
+                
+                // Check if obstacle overlaps with avoid areas
+                validPosition = !avoidAreas.some(area => 
+                    !(obstacle.x > area.x + area.width || 
+                      obstacle.x + obstacle.width < area.x ||
+                      obstacle.y > area.y + area.height ||
+                      obstacle.y + obstacle.height < area.y)
+                );
+                
+                attempts++;
+            }
+            
+            if (validPosition) {
+                obstacles.push(obstacle);
+            }
+        }
         
         return obstacles;
     }
@@ -503,15 +546,24 @@ class NeonGolf {
     checkHole() {
         const dist = Math.sqrt((this.ball.x - this.hole.x) ** 2 + (this.ball.y - this.hole.y) ** 2);
         
+        // Add "magnetic" effect near hole - slows down ball when approaching
+        if (dist < this.hole.radius * 3 && dist > this.hole.radius) {
+            const slowdownFactor = 0.95; // Gradual slowdown when near hole
+            this.ball.vx *= slowdownFactor;
+            this.ball.vy *= slowdownFactor;
+        }
+        
         if (dist < this.hole.radius - this.ball.radius) {
             // Calculate current ball speed
             const currentSpeed = Math.sqrt(this.ball.vx * this.ball.vx + this.ball.vy * this.ball.vy);
-            const maxHoleSpeed = 3; // Maximum speed to successfully enter hole
+            const maxHoleSpeed = 6; // Increased from 3 - more forgiving!
             
             if (currentSpeed <= maxHoleSpeed) {
                 // Ball is moving slow enough - successful hole!
                 this.ball.vx = 0;
                 this.ball.vy = 0;
+                // Start Jeff rain celebration!
+                this.startJeffRain();
                 this.gameOver(true);
             } else {
                 // Ball is moving too fast - overshoot!
@@ -569,6 +621,79 @@ class NeonGolf {
         }, 1500);
     }
     
+    startJeffRain() {
+        this.jeffRainActive = true;
+        this.jeffRain = [];
+        
+        // Create 50 falling Jeffs!
+        for (let i = 0; i < 50; i++) {
+            this.jeffRain.push({
+                x: Math.random() * this.canvas.width,
+                y: -Math.random() * 500 - 50, // Start above screen
+                vx: (Math.random() - 0.5) * 4, // Small horizontal drift
+                vy: Math.random() * 3 + 2, // Falling speed
+                rotation: Math.random() * Math.PI * 2, // Random rotation
+                rotationSpeed: (Math.random() - 0.5) * 0.3, // Spinning
+                size: 20 + Math.random() * 20, // Random size 20-40px
+                alpha: 0.8 + Math.random() * 0.2 // Slight transparency variation
+            });
+        }
+        
+        // Stop rain after 8 seconds
+        setTimeout(() => {
+            this.jeffRainActive = false;
+        }, 8000);
+    }
+    
+    updateJeffRain() {
+        if (!this.jeffRainActive) return;
+        
+        for (let i = this.jeffRain.length - 1; i >= 0; i--) {
+            const jeff = this.jeffRain[i];
+            
+            // Update position
+            jeff.x += jeff.vx;
+            jeff.y += jeff.vy;
+            jeff.rotation += jeff.rotationSpeed;
+            
+            // Add slight gravity acceleration
+            jeff.vy += 0.1;
+            
+            // Remove if fell below screen
+            if (jeff.y > this.canvas.height + 50) {
+                this.jeffRain.splice(i, 1);
+            }
+        }
+    }
+    
+    drawJeffRain() {
+        if (!this.jeffRainActive || !this.ballImageLoaded) return;
+        
+        for (let jeff of this.jeffRain) {
+            this.ctx.save();
+            
+            // Move to Jeff position and rotate
+            this.ctx.translate(jeff.x, jeff.y);
+            this.ctx.rotate(jeff.rotation);
+            this.ctx.globalAlpha = jeff.alpha;
+            
+            // Add neon glow effect to raining Jeffs
+            this.ctx.shadowColor = '#00ffff';
+            this.ctx.shadowBlur = 15;
+            
+            // Draw Jeff image
+            this.ctx.drawImage(
+                this.ballImage,
+                -jeff.size / 2,
+                -jeff.size / 2,
+                jeff.size,
+                jeff.size
+            );
+            
+            this.ctx.restore();
+        }
+    }
+    
     gameOver(won) {
         this.gameState = won ? 'won' : 'lost';
         const statusEl = document.getElementById('gameStatus');
@@ -620,6 +745,10 @@ class NeonGolf {
             }
         }
         
+        // Clear Jeff rain celebration
+        this.jeffRainActive = false;
+        this.jeffRain = [];
+        
         document.getElementById('strokes').textContent = '0';
         document.getElementById('powerFill').style.width = '0%';
         document.getElementById('gameStatus').textContent = '';
@@ -627,8 +756,8 @@ class NeonGolf {
     }
     
     render() {
-        // Clear canvas with retro background
-        this.ctx.fillStyle = '#001122';
+        // Clear canvas with EXTREME neon background
+        this.ctx.fillStyle = '#000033';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
         // Draw grid pattern
@@ -652,25 +781,32 @@ class NeonGolf {
         if (this.club.isDragging) {
             this.drawAimLine();
         }
+        
+        // Draw Jeff rain celebration (on top of everything!)
+        this.drawJeffRain();
     }
     
     drawGrid() {
-        this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.1)';
+        this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.3)';
         this.ctx.lineWidth = 1;
+        this.ctx.shadowColor = '#00ffff';
+        this.ctx.shadowBlur = 2;
         
-        for (let x = 0; x < this.canvas.width; x += 40) {
+        for (let x = 0; x < this.canvas.width; x += 30) {
             this.ctx.beginPath();
             this.ctx.moveTo(x, 0);
             this.ctx.lineTo(x, this.canvas.height);
             this.ctx.stroke();
         }
         
-        for (let y = 0; y < this.canvas.height; y += 40) {
+        for (let y = 0; y < this.canvas.height; y += 30) {
             this.ctx.beginPath();
             this.ctx.moveTo(0, y);
             this.ctx.lineTo(this.canvas.width, y);
             this.ctx.stroke();
         }
+        
+        this.ctx.shadowBlur = 0;
     }
     
     drawObstacles() {
@@ -680,19 +816,19 @@ class NeonGolf {
             if (obstacle.type === 'face') {
                 this.drawFaceObstacle(obstacle);
             } else {
-                if (obstacle.type === 'wall') {
-                    this.ctx.fillStyle = '#ff00ff';
-                    this.ctx.shadowColor = '#ff00ff';
-                    this.ctx.shadowBlur = 10;
-                } else if (obstacle.type === 'water') {
-                    this.ctx.fillStyle = '#0066ff';
-                    this.ctx.shadowColor = '#0066ff';
-                    this.ctx.shadowBlur = 15;
-                } else {
-                    this.ctx.fillStyle = '#00ffff';
-                    this.ctx.shadowColor = '#00ffff';
-                    this.ctx.shadowBlur = 10;
-                }
+                            if (obstacle.type === 'wall') {
+                this.ctx.fillStyle = '#ff00ff';
+                this.ctx.shadowColor = '#ff00ff';
+                this.ctx.shadowBlur = 20;
+            } else if (obstacle.type === 'water') {
+                this.ctx.fillStyle = '#0099ff';
+                this.ctx.shadowColor = '#0099ff';
+                this.ctx.shadowBlur = 25;
+            } else {
+                this.ctx.fillStyle = '#00ffff';
+                this.ctx.shadowColor = '#00ffff';
+                this.ctx.shadowBlur = 20;
+            }
                 
                 this.ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
                 
@@ -1031,6 +1167,7 @@ class NeonGolf {
     
     gameLoop() {
         this.updateBall();
+        this.updateJeffRain(); // Update falling Jeffs
         this.render();
         requestAnimationFrame(() => this.gameLoop());
     }
