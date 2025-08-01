@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEON GOLF '85</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <h1 class="game-title">NEON GOLF '85</h1>
+            <div class="game-info">
+                <div class="info-item">
+                    <span class="label">PAR:</span>
+                    <span class="value" id="par">3</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">STROKES:</span>
+                    <span class="value" id="strokes">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">POWER:</span>
+                    <div class="power-meter">
+                        <div class="power-fill" id="powerFill"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="game-area">
+            <canvas id="gameCanvas"></canvas>
+        </div>
+
+        <div class="game-status" id="gameStatus"></div>
+        
+        <div class="controls">
+            <button id="resetBtn" class="neon-button">RESET</button>
+            <div class="instructions">
+                CLICK & DRAG THE CLUB TO AIM AND POWER UP!<br/>
+                <small>⚠️ TOO MUCH POWER WILL OVERSHOOT THE HOLE! ⚠️</small><br/>
+                <small>🎯 SHOOT INTO THE OVAL FACE'S MOUTH FOR A SURPRISE EXIT! 🎯</small>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
